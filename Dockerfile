@@ -3,8 +3,8 @@ FROM python
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
-COPY main.py main.py
-
 RUN pip install -r requirements.txt
+
+COPY . .
 
 CMD ["uvicorn", "main:app"]
