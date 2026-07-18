@@ -17,12 +17,19 @@ class OTP(Generate_OTP):
 
 @app.get("/")
 def get_user():
+    curr_count = r.incr("user:limit")
+    if curr_count == 1:
+        r.expire("user:limit", 10)
+    
+    if curr_count > 10:
+        return {"message":"Wait for few seconds"}
+        
     if r.get("user:data"):
         return json.loads(r.get("user:data"))
     else:
         time.sleep(2)
         user = {"name":"Vansh", "email":"vansh@gmail.com","age":23}
-        r.set("user:data", json.dumps(user))
+        r.set("user:data", json.dumps(user), ex=60)
         return user
     
 @app.post('/generate_otp')
