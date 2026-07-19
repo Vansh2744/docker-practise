@@ -5,6 +5,7 @@ import json
 import random
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from tasks import send_email
 
 app = FastAPI()
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
@@ -49,3 +50,12 @@ def verify_otp(otp_body:OTP):
         return {"message":"Incorrect OTP"}
     
     return {"message":"OTP Verified"}
+
+@app.post('/login')
+async def login(user:Generate_OTP):
+    result = send_email.delay(user.email)
+    print(result)
+    return {
+        "message":"User Logged in",
+        "email":user.email
+    }
