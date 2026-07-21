@@ -1,6 +1,12 @@
 import os
 from fastapi import FastAPI
 import httpx
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+gateway = os.getenv("GATEWAY")
 
 app = FastAPI(title="API Gateway")
 
@@ -19,7 +25,7 @@ async def proxy_get(service: str):
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(url, timeout=5.0)
-            return response.json()
+            return {**response.json(), "gateway":gateway}
         except httpx.RequestError:
             return {"error": f"{service} service is unavailable"}
 
@@ -32,6 +38,6 @@ async def proxy_post(service: str, path: str):
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(url, timeout=5.0)
-            return response.json()
+            return {**response.json(), "gateway":gateway}
         except httpx.RequestError:
             return {"error": f"{service} service is unavailable"}
